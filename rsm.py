@@ -3,15 +3,15 @@
 # Really Small Music (RSM)
 
 import numpy
-import numpy.fft
-import torch
-import torchaudio
 import math
 import sys
+import soundfile
 
-def allNotes():
+def allNotes(sr):
+    a4 = 440 * (sr / 44100)
+
     for i in range(88):
-        yield (440 / 16) * (2 ** (i / 12))
+        yield (a4 / 16) * (2 ** (i / 12))
 
 def main():
     if len(sys.argv) < 4:
@@ -19,8 +19,8 @@ def main():
 
     if sys.argv[1] == 'zip':
         print('Loading...')
-        audio, sr = torchaudio.load(sys.argv[2])
-        audio = torchaudio.functional.resample(audio, sr, 44100)
+        audio, sr = soundfile.read(sys.argv[2])
+        audio = audio.T.reshape(-1, audio.shape[0])
 
         tmpAudio = audio[0]
 
@@ -28,21 +28,20 @@ def main():
             tmpAudio += audio[i]
 
         audio = tmpAudio / len(audio)
-        audio = audio.numpy()
 
         print('Compressing...')
 
         song = []
 
-        for i in range(0, len(audio) - 4410, 4410):
-            print(f'Progress: {(i // 4410)} / {(len(audio) - 4410) // 4410}')
+        for i in range(0, len(audio) - int(sr / 10), int(sr / 10)):
+            print(f'Progress: {int(i / (sr / 10))} / {(len(audio) - int(sr / 10)) // int(sr / 10)}')
 
-            transform = abs(numpy.fft.fft(audio[i : i + 4410]))
+            transform = abs(numpy.fft.fft(audio[i : i + int(sr / 10)]))
 
             notes = []
 
-            for note in allNotes():
-                notes.append(int((transform[int(note / 10)] / 2205) * 256))
+            for note in allNotes(sr):
+                notes.append(int((transform[int(note / 10)] / int(sr / 20)) * 256))
 
             song.append(notes)
 
@@ -66,11 +65,11 @@ def main():
 
         index = 0
         orig = numpy.array([])
-        allNotes2 = [item for item in allNotes()]
+        allNotes2 = [item for item in allNotes(44100)]
 
         signals = {}
 
-        for note in allNotes():
+        for note in allNotes(44100):
             signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
 
         for notes in song:
@@ -84,12 +83,12 @@ def main():
             orig = numpy.append(orig, chunk)
 
             if index % 1000 == 999:
-                torchaudio.save(sys.argv[3], torch.FloatTensor(numpy.array([orig, orig])), 44100)
+                soundfile.write(sys.argv[3], numpy.array(orig), 44100)
 
             index += 1
 
         print('Saving...')
-        torchaudio.save(sys.argv[3], torch.FloatTensor(numpy.array([orig, orig])), 44100)
+        soundfile.write(sys.argv[3], numpy.array(orig), 44100)
 
 if __name__ == '__main__':
     main()
