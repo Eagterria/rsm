@@ -19,16 +19,13 @@ The main reason why I wanted something like this was to be able to train a gener
 Older versions may or may not work. Tested on Debian Bookworm.
 
 * numpy >= 1.24.2
-* torch >= 1.13.0
-* torchaudio >= 0.13.1
+* soundfile >= 0.10.3
 
 ## Usage
 
-*NOTE: Can compress wav as well.*
-
 To convert from standard audio to RSM:
 
-`python3 rsm.py zip /path/to/audio.mp3 /path/to/audio.rsm`
+`python3 rsm.py zip /path/to/audio.wav /path/to/audio.rsm`
 
 To uncompress RSM to standard audio:
 
