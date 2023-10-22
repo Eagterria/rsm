@@ -19,7 +19,6 @@ The main reason why I wanted something like this was to be able to train a gener
 Older versions may or may not work. Tested on Debian Bookworm.
 
 * numpy >= 1.24.2
-* soundfile >= 0.10.3
 
 ## Usage
 
