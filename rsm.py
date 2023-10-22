@@ -5,7 +5,7 @@
 import numpy
 import math
 import sys
-import soundfile
+import wave
 
 def allNotes(sr):
     a4 = 440 * (sr / 44100)
@@ -19,15 +19,21 @@ def main():
 
     if sys.argv[1] == 'zip':
         print('Loading...')
-        audio, sr = soundfile.read(sys.argv[2])
-        audio = audio.T.reshape(-1, audio.shape[0])
+
+        with wave.open(sys.argv[2], 'rb') as f:
+            nchannels = f.getnchannels()
+            sr = f.getframerate()
+            audio = numpy.frombuffer(f.readframes(f.getnframes()), dtype=numpy.int16).astype(numpy.float32)
+
+        audio = audio.reshape(-1, nchannels).T.reshape(nchannels, -1)
 
         tmpAudio = audio[0]
 
         for i in range(1, len(audio)):
             tmpAudio += audio[i]
 
-        audio = tmpAudio / len(audio)
+        tmpAudio *= 1 / max(tmpAudio)
+        audio = tmpAudio
 
         print('Compressing...')
 
@@ -83,12 +89,21 @@ def main():
             orig = numpy.append(orig, chunk)
 
             if index % 1000 == 999:
-                soundfile.write(sys.argv[3], numpy.array(orig), 44100)
+                with wave.open(sys.argv[3], 'wb') as f:
+                    f.setnchannels(1)
+                    f.setsampwidth(2)
+                    f.setframerate(44100)
+                    f.writeframes((orig * (((2 ** 15) - 1) / max(orig))).astype(numpy.int16).tobytes())
 
             index += 1
 
         print('Saving...')
-        soundfile.write(sys.argv[3], numpy.array(orig), 44100)
+
+        with wave.open(sys.argv[3], 'wb') as f:
+            f.setnchannels(1)
+            f.setsampwidth(2)
+            f.setframerate(44100)
+            f.writeframes((orig * (((2 ** 15) - 1) / max(orig))).astype(numpy.int16).tobytes())
 
 if __name__ == '__main__':
     main()
