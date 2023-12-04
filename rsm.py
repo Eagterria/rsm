@@ -39,7 +39,7 @@ def main():
 
         song = []
 
-        for i in range(0, len(audio) - int(sr / 10), int(sr / 10)):
+        for i in range(0, len(audio) - int(sr / 10), int(sr / 20)):
             print(f'Progress: {int(i / (sr / 10))} / {(len(audio) - int(sr / 10)) // int(sr / 10)}')
 
             transform = abs(numpy.fft.fft(audio[i : i + int(sr / 10)]))
@@ -76,12 +76,12 @@ def main():
         signals = {}
 
         for note in allNotes(44100):
-            signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
+            signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(2205)])
 
         for notes in song:
             print(f'Progress: {index + 1} / {len(song)}')
 
-            chunk = numpy.zeros(4410)
+            chunk = numpy.zeros(2205)
 
             for i in range(len(allNotes2)):
                 chunk += signals[float(allNotes2[i])] * (notes[i] / 2205)
