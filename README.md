@@ -4,11 +4,11 @@ A very, VERY lossy music compressor I made overnight that retains musical notes.
 
 ## How does it work?
 
-RSM takes in an audio file, performs an FFT for every tenth of a second, and extracts the values of 88 frequencies (A0 through C8, as on a standard piano), quantizes the values to fit in one byte each, and writes the values to a file. Given this file, it can convert the compressed values to sine wave notes and write the audio to a wav file to listen to. When uncompressing to a wav file, melodies are mostly discernible, despite the extremely small size of the compressed file.
+RSM takes in an audio file, performs an FFT for every 1/20 of a second, and extracts the values of 88 frequencies (A0 through C8, as on a standard piano), quantizes the values to fit in one byte each, and writes the values to a file. Given this file, it can convert the compressed values to sine wave notes and write the audio to a wav file to listen to. When uncompressing to a wav file, melodies are mostly discernible, despite the extremely small size of the compressed file.
 
-Every 88 bytes is a new frame, spanning 1/10 of a second. The 88 values are the volumes of the 88 keys in ascending order. The file format itself is headerless, defaulting to 32-bit floats, 2 channels, and 44100 Hz when unzipped.
+Every 88 bytes is a new frame, spanning 1/20 of a second. The 88 values are the volumes of the 88 keys in ascending order. The file format itself is headerless, defaulting to 32-bit floats, 2 channels, and 44100 Hz when unzipped.
 
-The compressed format can be shrunk further using a standard file compressor (zip/xz/gzip/7z), for a total of up to about 1/80 the size of its mp3 equivalent (given that the mp3 uses 32-bit floats, 2 channels, and 44100 Hz).
+The compressed format can be shrunk further using a standard file compressor (zip/xz/gzip/7z), for a total of up to about 1/40 the size of its mp3 equivalent (given that the mp3 uses 32-bit floats, 2 channels, and 44100 Hz).
 
 ## Why use this?
 
