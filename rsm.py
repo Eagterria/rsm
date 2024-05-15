@@ -70,37 +70,40 @@ def main():
                 song.append(chunk)
 
         index = 0
-        orig = numpy.array([])
         allNotes2 = [item for item in allNotes(44100)]
 
         signals = {}
+        peak = (2 ** 15) - 1
 
         for note in allNotes(44100):
             # signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
             width = 44100 / note
             signals[note] = numpy.array([1 if t % width < width / 2 else -1 for t in range(4410)])
 
-        for notes in song:
-            print(f'Progress: {index + 1} / {len(song)}')
-
-            chunk = numpy.zeros(2205)
-
-            for i in range(len(allNotes2)):
-                width = 44100 / allNotes2[i]
-                start = int((index * 2205) % width)
-                chunk += signals[float(allNotes2[i])][start : start + 2205] * (notes[i] / 2205)
-
-            orig = numpy.append(orig, chunk)
-
-            index += 1
-
-        print('Saving...')
-
         with wave.open(sys.argv[3], "wb") as f:
             f.setnchannels(1)
             f.setsampwidth(2)
             f.setframerate(44100)
-            f.writeframes((orig * (((2 ** 15) - 1) / max(orig))).astype(numpy.int16).tobytes())
+            
+            for notes in song:
+                print(f'Progress: {index + 1} / {len(song)}')
+    
+                chunk = numpy.zeros(2205)
+    
+                for i in range(len(allNotes2)):
+                    width = 44100 / allNotes2[i]
+                    start = int((index * 2205) % width)
+                    chunk += signals[float(allNotes2[i])][start : start + 2205] * (notes[i] / 2205)
+
+                if max(chunk) > peak:
+                    peak *= peak / max(chunk)
+
+                if max(chunk) != 0:
+                    chunk *= peak / max(chunk)
+                    
+                f.writeframes(chunk.astype(numpy.int16).tobytes())
+    
+                index += 1
 
 if __name__ == '__main__':
     main()
