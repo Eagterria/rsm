@@ -76,9 +76,7 @@ def main():
         peak = (2 ** 15) - 1
 
         for note in allNotes(44100):
-            # signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
-            width = 44100 / note
-            signals[note] = numpy.array([1 if t % width < width / 2 else -1 for t in range(4410)])
+            signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
 
         with wave.open(sys.argv[3], "wb") as f:
             f.setnchannels(1)
@@ -95,11 +93,13 @@ def main():
                     start = int((index * 2205) % width)
                     chunk += signals[float(allNotes2[i])][start : start + 2205] * (notes[i] / 2205)
 
-                if max(chunk) > peak:
-                    peak *= peak / max(chunk)
+                biggest = max(np.abs(chunk))
+                
+                if biggest > peak:
+                    peak *= peak / biggest
 
-                if max(chunk) != 0:
-                    chunk *= peak / max(chunk)
+                if biggest != 0:
+                    chunk *= peak / biggest
                     
                 f.writeframes(chunk.astype(numpy.int16).tobytes())
     
