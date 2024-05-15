@@ -84,7 +84,7 @@ def main():
             chunk = numpy.zeros(2205)
 
             for i in range(len(allNotes2)):
-                width = 44100 / allNotes[i]
+                width = 44100 / allNotes2[i]
                 start = int((index * 2205) % width)
                 chunk += signals[float(allNotes2[i])][start : start + 2205] * (notes[i] / 2205)
 
