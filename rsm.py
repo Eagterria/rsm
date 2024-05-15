@@ -77,7 +77,8 @@ def main():
 
         for note in allNotes(44100):
             # signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
-            signals[note] = numpy.array([1 if t % note < note / 2 else -1 for t in range(4410)])
+            width = 44100 / note
+            signals[note] = numpy.array([1 if t % width < width / 2 else -1 for t in range(4410)])
 
         for notes in song:
             print(f'Progress: {index + 1} / {len(song)}')
