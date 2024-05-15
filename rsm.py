@@ -76,7 +76,7 @@ def main():
         signals = {}
 
         for note in allNotes(44100):
-            signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(2205)])
+            signals[note] = numpy.array([math.sin((t * 2 * math.pi * note) / 44100) for t in range(4410)])
 
         for notes in song:
             print(f'Progress: {index + 1} / {len(song)}')
@@ -84,7 +84,9 @@ def main():
             chunk = numpy.zeros(2205)
 
             for i in range(len(allNotes2)):
-                chunk += signals[float(allNotes2[i])] * (notes[i] / 2205)
+                width = 44100 / allNotes[i]
+                start = int((index * 2205) % width)
+                chunk += signals[float(allNotes2[i])][start : start + 2205] * (notes[i] / 2205)
 
             orig = numpy.append(orig, chunk)
 
