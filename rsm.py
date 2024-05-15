@@ -93,7 +93,7 @@ def main():
                     start = int((index * 2205) % width)
                     chunk += signals[float(allNotes2[i])][start : start + 2205] * (notes[i] / 2205)
 
-                biggest = max(np.abs(chunk))
+                biggest = max(numpy.abs(chunk))
                 
                 if biggest > peak:
                     peak *= peak / biggest
