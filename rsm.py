@@ -80,8 +80,6 @@ def main():
             width = 44100 / note
             signals[note] = numpy.array([1 if t % width < width / 2 else -1 for t in range(4410)])
 
-        flags = "wb"
-
         for notes in song:
             print(f'Progress: {index + 1} / {len(song)}')
 
@@ -94,21 +92,11 @@ def main():
 
             orig = numpy.append(orig, chunk)
 
-            if index % 1000 == 999:
-                with wave.open(sys.argv[3], flags) as f:
-                    f.setnchannels(1)
-                    f.setsampwidth(2)
-                    f.setframerate(44100)
-                    f.writeframes((orig * (((2 ** 15) - 1) / max(orig))).astype(numpy.int16).tobytes())
-
-                flags = "ab"
-                orig = numpy.array([])
-
             index += 1
 
         print('Saving...')
 
-        with wave.open(sys.argv[3], flags) as f:
+        with wave.open(sys.argv[3], "wb") as f:
             f.setnchannels(1)
             f.setsampwidth(2)
             f.setframerate(44100)
